@@ -8,55 +8,69 @@
 
 #import "ViewController.h"
 
+#define kTopViewHeight 175
+#define kStatusBarSize 20
 @interface ViewController ()
 
 @end
 
 @implementation ViewController
-@synthesize viewForm,chatBox,chatButton;
+@synthesize viewForm,chatBox,chatButton,messages,tableView;
 -(void)awakeFromNib {
     
-    _messages = [[NSArray alloc] initWithObjects:
+    NSArray *messagesArr = [[NSArray alloc] initWithObjects:
               @"Hello, how are you.",
               @"I'm great, how are you?",
               @"I'm fine, thanks. Up for dinner tonight?",
               @"Glad to hear. No sorry, I have to work.",
               @"Oh that sucks. A pitty, well then - have a nice day.."
               @"Thanks! You too. Cuu soon.",
-                 @"Hello, how are you.",
-                 @"I'm great, how are you?",
-                 @"I'm fine, thanks. Up for dinner tonight?",
-                 @"Glad to hear. No sorry, I have to work.",
-                 @"Oh that sucks. A pitty, well then - have a nice day.."
-                 @"Thanks! You too. Cuu soon.",
-                 @"hay",
-                 @"guy",
               nil];
     
+    messages = [[NSMutableArray alloc]initWithArray:messagesArr];
     [super awakeFromNib];
 }
 
 - (void)viewDidLoad {
     
+    isTopView = YES;
+    CGFloat viewOriginY = 20;
+    if(isTopView)
+    {
+    self.topView =[[UIView alloc]initWithFrame:CGRectMake(0,viewOriginY,320,155)];
+    self.topView.backgroundColor = [UIColor lightGrayColor];
+    [self.view addSubview: self.topView];
+        
+        viewOriginY += self.topView.frame.size.height+10;
+    }
     
-    self.tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,20,320,502)];
+    
+    self.tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,viewOriginY,320,339)];
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    
     [self.view addSubview:self.tableView];
     
-    self.viewForm = [[UIView alloc]initWithFrame:CGRectMake(0,524,320,44)];
-    self.viewForm.backgroundColor =[UIColor yellowColor];
+    viewOriginY += self.tableView.frame.size.height;
+    
+    self.viewForm = [[UIView alloc]initWithFrame:CGRectMake(0,viewOriginY,320,44)];
+    self.viewForm.backgroundColor = [self colorFromHexString:@"#F1F1F1"];
     [self.view addSubview:self.viewForm];
     
-    self.chatBox = [[UITextView alloc]initWithFrame:CGRectMake(10,7,250,30)];
+    self.chatBox = [[UITextView alloc]initWithFrame:CGRectMake(10,7,230,30)];
     self.chatBox.delegate =self;
-    self.chatBox.backgroundColor =[UIColor lightGrayColor];
+    self.chatBox.backgroundColor = [self colorFromHexString:@"#FCFCFC"];
+    self.chatBox.autocapitalizationType = FALSE;
+    self.chatBox.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self.chatBox.keyboardType = UIKeyboardTypeDefault;
+    
+    self.chatBox.layer.cornerRadius = 7;
+    self.chatBox.layer.masksToBounds = YES;
     [self.viewForm addSubview:self.chatBox];
     
-    self.chatButton = [[UIButton alloc]initWithFrame: CGRectMake(260, 7, 50, 30)];
-    self.chatButton.backgroundColor = [UIColor blackColor];
+    self.chatButton = [[UIButton alloc]initWithFrame: CGRectMake(255, 7, 50, 30)];
+    self.chatButton.backgroundColor = [UIColor clearColor];
+    [self.chatButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [self.chatButton addTarget:self action:@selector(chatButtonClick) forControlEvents:UIControlEventTouchUpInside];
     [self.chatButton setTitle:@"Send" forState:UIControlStateNormal];
     [self.viewForm addSubview:self.chatButton];
@@ -96,11 +110,21 @@
     [[note.userInfo valueForKey:UIKeyboardBoundsUserInfoKey] getValue: &keyboardBounds];
     
     // get the height since this is the main value that we need.
+    
+    // get a rect for the table/main frame
+    CGRect topviewFrame = self.topView.frame;
+    topviewFrame.origin.y -= kTopViewHeight;
+
     NSInteger kbSizeH = keyboardBounds.size.height;
     
     // get a rect for the table/main frame
     CGRect tableFrame = tableView.frame;
+    tableFrame.origin.y -=kTopViewHeight;
+    tableFrame.origin.y +=kStatusBarSize;
     tableFrame.size.height -= kbSizeH;
+    tableFrame.size.height += kTopViewHeight;
+    tableFrame.size.height -= kStatusBarSize;
+    
     
     // get a rect for the form frame
     CGRect formFrame = viewForm.frame;
@@ -114,6 +138,9 @@
     // set views with new info
     tableView.frame = tableFrame;
     viewForm.frame = formFrame;
+    
+    [tableView setContentOffset:CGPointMake(0,tableView.contentSize.height - tableView.frame.size.height)]
+    ;
     
     // commit animations
     [UIView commitAnimations];
@@ -159,8 +186,12 @@
             CGRect tableFrame = tableView.frame;
             NSInteger viewTableH = tableFrame.size.height;
             NSLog(@"TABLE VIEW HEIGHT : %ld", (long)viewTableH);
-            tableFrame.size.height = 272 - (newSizeH - 18);
+            tableFrame.size.height = 252 - (newSizeH - 18);
             tableView.frame = tableFrame;
+            
+            [tableView setContentOffset:CGPointMake(0,tableView.contentSize.height - tableView.frame.size.height)]
+            ;
+
         }
         
         // if our new height is greater than 90
@@ -169,6 +200,9 @@
         if (newSizeH > 90)
         {
             chatBox.scrollEnabled = YES;
+            [tableView setContentOffset:CGPointMake(0,tableView.contentSize.height - tableView.frame.size.height)]
+            ;
+
         }
     }
 }
@@ -176,22 +210,47 @@
 - (void)chatButtonClick{
     // hide the keyboard, we are done with it.
     [chatBox resignFirstResponder];
+    [messages addObject:chatBox.text];
     chatBox.text = nil;
     
     // chatbox
     CGRect chatBoxFrame = chatBox.frame;
     chatBoxFrame.size.height = 30;
     chatBox.frame = chatBoxFrame;
+    
     // form view
     CGRect formFrame = viewForm.frame;
-    formFrame.size.height = 45;
+    formFrame.size.height = 44;
     formFrame.origin.y = 524;
     viewForm.frame = formFrame;
     
+    // get a rect for the table/main frame
+    CGRect topviewFrame = self.topView.frame;
+    topviewFrame.origin.y  = 0;
+
     // table view
     CGRect tableFrame = tableView.frame;
-    tableFrame.size.height = 524;
+    tableFrame.origin.y = kTopViewHeight+10;
+    tableFrame.size.height = 339;
     tableView.frame = tableFrame;
+
+    
+    // animations settings
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationDuration:0.3f];
+    
+    // set views with new info
+    tableView.frame = tableFrame;
+    viewForm.frame = formFrame;
+    [self.tableView reloadData];
+    [tableView setContentOffset:CGPointMake(0,tableView.contentSize.height - tableView.frame.size.height)]
+    ;
+
+    
+    // commit animations
+    [UIView commitAnimations];
+
 }
 
 -(void) keyboardWillHide:(NSNotification *)note{
@@ -200,12 +259,22 @@
     CGRect keyboardBounds;
     [[note.userInfo valueForKey:UIKeyboardBoundsUserInfoKey] getValue: &keyboardBounds];
     
+    
+    // get a rect for the table/main frame
+    CGRect topviewFrame = self.topView.frame;
+    topviewFrame.origin.y += kTopViewHeight;
+    
     // get the height since this is the main value that we need.
     NSInteger kbSizeH = keyboardBounds.size.height;
     
     // get a rect for the table/main frame
     CGRect tableFrame = tableView.frame;
+    tableFrame.origin.y += kTopViewHeight;
+    tableFrame.origin.y -=kStatusBarSize;
     tableFrame.size.height += kbSizeH;
+    tableFrame.size.height -= kTopViewHeight;
+    tableFrame.size.height += kStatusBarSize;
+
     
     // get a rect for the form frame
     CGRect formFrame = viewForm.frame;
@@ -219,6 +288,9 @@
     // set views with new info
     tableView.frame = tableFrame;
     viewForm.frame = formFrame;
+    [tableView setContentOffset:CGPointMake(0,tableView.contentSize.height - tableView.frame.size.height)]
+    ;
+
     
     // commit animations
     [UIView commitAnimations];
@@ -228,7 +300,7 @@
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_messages count];
+    return [messages count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView1 cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -248,9 +320,9 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    CGSize messageSize = [PTSMessagingCell messageSize:[_messages objectAtIndex:indexPath.row]];
-//    return messageSize.height + 2*[PTSMessagingCell textMarginVertical] + 40.0f;
-        return messageSize.height + 2*[PTSMessagingCell textMarginVertical]+15;
+    CGSize messagesize = [PTSMessagingCell messageSize:[messages objectAtIndex:indexPath.row]];
+//    return messagesize.height + 2*[PTSMessagingCell textMarginVertical] + 40.0f;
+        return messagesize.height + 2*[PTSMessagingCell textMarginVertical]+15;
 }
 
 -(void)configureCell:(id)cell atIndexPath:(NSIndexPath *)indexPath {
@@ -264,9 +336,19 @@
         ccell.avatarImageView.image = [UIImage imageNamed:@""];
     }
     
-    ccell.messageLabel.text = [_messages objectAtIndex:indexPath.row];
+    ccell.messageLabel.text = [messages objectAtIndex:indexPath.row];
     ccell.timeLabel.text = @"";
 }
+
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
+}
+
+
 
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
     return YES;

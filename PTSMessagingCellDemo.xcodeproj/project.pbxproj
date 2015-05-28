@@ -88,13 +88,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8BF62B031B1310C3002161D1 /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "New Group";
-			sourceTree = "<group>";
-		};
 		B52B225D1604E90B00705A8E = {
 			isa = PBXGroup;
 			children = (
@@ -154,7 +147,6 @@
 		B5BF586A1604F05000965D6E /* PTSMessagingCell */ = {
 			isa = PBXGroup;
 			children = (
-				8BF62B031B1310C3002161D1 /* New Group */,
 				B5BF586C1604F05000965D6E /* balloon_read_right.png */,
 				8BF51A301B16D5380062821F /* bubble_yellow.png */,
 				8BF51A311B16D5380062821F /* bubble_yellow1@3x.png */,

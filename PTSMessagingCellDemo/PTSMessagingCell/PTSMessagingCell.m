@@ -41,15 +41,6 @@ static CGFloat messageTextSize = 14.0;
 }
 
 +(UIImage*)balloonImage:(BOOL)sent isSelected:(BOOL)selected {
-//    if (sent == YES && selected == YES) {
-//        return [[UIImage imageNamed:@"balloon_selected_right"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
-//    } else if (sent == YES && selected == NO) {
-//        return [[UIImage imageNamed:@"balloon_read_right"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
-//    } else if (sent == NO && selected == YES) {
-//        return [[UIImage imageNamed:@"balloon_selected_left"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
-//    } else {
-//        return [[UIImage imageNamed:@"balloon_read_left"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
-//    }
     if (sent == YES && selected == YES) {
         return [[UIImage imageNamed:@"bubble_yellow"] stretchableImageWithLeftCapWidth:22 topCapHeight:15];
     } else if (sent == YES && selected == NO) {
