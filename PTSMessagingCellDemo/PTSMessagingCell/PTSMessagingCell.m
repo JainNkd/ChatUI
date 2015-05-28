@@ -12,7 +12,7 @@
 @implementation PTSMessagingCell
 
 static CGFloat textMarginHorizontal = 15.0f;
-static CGFloat textMarginVertical = 8.5f;
+static CGFloat textMarginVertical = 7.5f;
 static CGFloat messageTextSize = 14.0;
 
 @synthesize sent, messageLabel, messageView, timeLabel, avatarImageView, balloonView;
@@ -51,13 +51,13 @@ static CGFloat messageTextSize = 14.0;
 //        return [[UIImage imageNamed:@"balloon_read_left"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
 //    }
     if (sent == YES && selected == YES) {
-        return [[UIImage imageNamed:@"bubble yellow"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
+        return [[UIImage imageNamed:@"bubble_yellow"] stretchableImageWithLeftCapWidth:22 topCapHeight:15];
     } else if (sent == YES && selected == NO) {
-        return [[UIImage imageNamed:@"bubble yellow"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
+        return [[UIImage imageNamed:@"bubble_yellow"] stretchableImageWithLeftCapWidth:22 topCapHeight:15];
     } else if (sent == NO && selected == YES) {
-        return [[UIImage imageNamed:@"bubble grey"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
+        return [[UIImage imageNamed:@"bubble_grey"] stretchableImageWithLeftCapWidth:22 topCapHeight:15];
     } else {
-        return [[UIImage imageNamed:@"bubble grey"] stretchableImageWithLeftCapWidth:24 topCapHeight:15];
+        return [[UIImage imageNamed:@"bubble_grey"] stretchableImageWithLeftCapWidth:22 topCapHeight:15];
     }
 }
 
@@ -118,7 +118,7 @@ static CGFloat messageTextSize = 14.0;
     CGSize textSize = [PTSMessagingCell messageSize:self.messageLabel.text];
     
     /*Calculates the size of the timestamp.*/
-    CGSize dateSize = [self.timeLabel.text sizeWithFont:self.timeLabel.font forWidth:[PTSMessagingCell maxTextWidth] lineBreakMode:NSLineBreakByClipping];
+//    CGSize dateSize = [self.timeLabel.text sizeWithFont:self.timeLabel.font forWidth:[PTSMessagingCell maxTextWidth] lineBreakMode:NSLineBreakByClipping];
     
     /*Initializes the different frames , that need to be calculated.*/
     CGRect ballonViewFrame = CGRectZero;
@@ -127,20 +127,20 @@ static CGFloat messageTextSize = 14.0;
     CGRect avatarImageFrame = CGRectZero;
        
     if (self.sent == YES) {
-        timeLabelFrame = CGRectMake(self.frame.size.width - dateSize.width - textMarginHorizontal, 0.0f, dateSize.width, dateSize.height);
+//        timeLabelFrame = CGRectMake(self.frame.size.width - dateSize.width - textMarginHorizontal, 0.0f, dateSize.width, dateSize.height);
         
         ballonViewFrame = CGRectMake(self.frame.size.width - (textSize.width + 2*textMarginHorizontal)-10, timeLabelFrame.size.height, textSize.width + 2*textMarginHorizontal, textSize.height + 2*textMarginVertical);
         
-        messageLabelFrame = CGRectMake(self.frame.size.width - (textSize.width + textMarginHorizontal)-10,  ballonViewFrame.origin.y + textMarginVertical, textSize.width, textSize.height);
+        messageLabelFrame = CGRectMake(self.frame.size.width - (textSize.width + textMarginHorizontal)-10,  ballonViewFrame.origin.y + textMarginVertical-3, textSize.width, textSize.height);
         
         avatarImageFrame = CGRectMake(5.0f, timeLabelFrame.size.height, 50.0f, 50.0f);
 
     } else {
-        timeLabelFrame = CGRectMake(textMarginHorizontal, 0.0f, dateSize.width, dateSize.height);
+//        timeLabelFrame = CGRectMake(textMarginHorizontal, 0.0f, dateSize.width, dateSize.height);
         
         ballonViewFrame = CGRectMake(10.0f, timeLabelFrame.size.height, textSize.width + 2*textMarginHorizontal, textSize.height + 2*textMarginVertical);
         
-        messageLabelFrame = CGRectMake(textMarginHorizontal+10, ballonViewFrame.origin.y + textMarginVertical, textSize.width, textSize.height);
+        messageLabelFrame = CGRectMake(textMarginHorizontal+10, ballonViewFrame.origin.y + textMarginVertical-3, textSize.width, textSize.height);
         
         
         avatarImageFrame = CGRectMake(self.frame.size.width - 55.0f, timeLabelFrame.size.height, 50.0f, 50.0f);
